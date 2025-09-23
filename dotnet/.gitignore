@@ -1,4 +1,5 @@
 ## .NET Core
+logs/
 .env
 bin/
 obj/

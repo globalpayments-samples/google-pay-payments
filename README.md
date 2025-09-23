@@ -1,100 +1,164 @@
-# Global Payments SDK Starter Template
+# Google Pay Payments Integration
 
-This starter template provides a customizable foundation for Global Payments SDK integration across multiple programming languages. Each implementation includes basic SDK setup, configuration management, and placeholder endpoints that you can modify for your specific payment use cases.
+This project demonstrates Google Pay payment processing integration with the Global Payments GP-API across multiple programming languages. Each implementation shows how to handle encrypted mobile payment tokens from Google Pay and process them securely through the GP-API.
 
 ## Available Implementations
 
-- [.NET Core](./dotnet/) - ASP.NET Core web application
-- [Go](./go/) - Go HTTP server application
-- [Java](./java/) - Jakarta EE servlet-based web application
-- [Node.js](./nodejs/) - Express.js web application
-- [PHP](./php/) - PHP web application
-- [Python](./python/) - Flask web application
+- [.NET Core](./dotnet/) - ASP.NET Core web application with Google Pay integration
+- [Java](./java/) - Jakarta EE servlet-based web application with Google Pay support
+- [PHP](./php/) - PHP web application with Google Pay token processing
 
-## Template Features
+## Google Pay Features
 
-- **SDK Configuration** - Basic setup with environment variables
-- **Placeholder Endpoints** - Ready-to-customize API endpoints  
-- **Error Handling** - Basic error handling structure
-- **Client Integration** - HTML form with hosted fields tokenization
-- **Multiple Languages** - Consistent structure across all implementations
+- **Google Pay Token Processing** - Handle encrypted mobile payment tokens
+- **GP-API Integration** - Secure processing through Global Payments GP-API
+- **Comprehensive Validation** - Input validation and error handling
+- **Production Ready** - Complete implementation with security best practices
 
-## Customization Options
+## Implementation Features
 
-Each template includes:
+Each implementation includes:
 
-1. **Basic SDK Setup**
-   - Environment variable configuration
-   - Service URL configuration
-   - API key management
+1. **Google Pay Configuration**
+   - Merchant configuration endpoint
+   - Google Pay button settings
+   - Environment-specific configuration
+   - Currency and country code management
 
-2. **Starter Endpoints**
-   - GET `/config` - Configuration endpoint
-   - POST `/process-payment` - Payment processing template
-   - Commented examples for additional endpoints (authorize, capture, refund, etc.)
+2. **Payment Processing**
+   - GET `/config` - Google Pay merchant configuration
+   - POST `/process-google-pay` - Google Pay token processing
+   - Encrypted mobile token handling
+   - Multi-currency transaction support
 
-3. **Ready-to-Modify Structure**
-   - TODO comments for customization points
-   - Example payment logic you can adapt
-   - Placeholder functions for various payment flows
+3. **Security & Validation**
+   - Token format validation
+   - Amount and currency validation
+   - Comprehensive error handling
+   - Transaction status verification
 
 ## Quick Start
 
-1. **Copy the template** - Copy this directory to start your new project
-2. **Choose your language** - Navigate to any implementation directory (nodejs, python, php, java, dotnet, go)
-3. **Set up credentials** - Copy `.env.sample` to `.env` and add your Global Payments API keys
+1. **Choose your language** - Navigate to any implementation directory (dotnet, java, php)
+2. **Set up credentials** - Copy `.env.sample` to `.env` and add your Global Payments GP-API credentials
+3. **Configure Google Pay** - Update Google Pay merchant settings in `.env` file
 4. **Run the server** - Execute `./run.sh` to install dependencies and start the server
-5. **Customize** - Modify the code for your specific payment use case
+5. **Test payments** - Use the web interface to test Google Pay transactions
 
-## Use Cases You Can Build
+## Google Pay Integration Requirements
 
-This template can be adapted for various payment scenarios:
+To use this integration, you'll need:
 
-- **Basic Charges** - Simple one-time payments
-- **Authorization/Capture** - Two-step payment processing
-- **Subscriptions** - Recurring payment processing
-- **Refunds** - Payment reversal functionality
-- **Multi-step Checkouts** - Complex payment flows
-- **Payment Methods** - Credit cards, ACH, alternative payments
+- **Global Payments GP-API Account** - With Google Pay processing enabled
+- **Google Pay Merchant Account** - Registered with Google Pay
+- **SSL Certificate** - Required for Google Pay in production
+- **Development Environment** - For your chosen language (.NET, Java, or PHP)
 
 ## Prerequisites
 
-- Global Payments account with API credentials
+- Global Payments GP-API account with credentials:
+  - `GP_API_APP_ID` - Your application ID
+  - `GP_API_APP_KEY` - Your application key
+- Google Pay merchant configuration:
+  - Google Merchant ID for Google Pay
+  - Merchant name and display settings
 - Development environment for your chosen language
-- Package manager (npm, pip, composer, maven, dotnet, go mod)
+- Package manager (dotnet, maven, composer)
 
-## Customization Guide
+## Configuration Guide
 
-### Adding New Endpoints
+### Environment Variables
 
-Each implementation includes commented examples for common payment operations:
+Each implementation uses the following environment variables:
 
-```javascript
-// Authorization only
-app.post('/authorize', ...)
+```bash
+# Global Payments GP-API Configuration
+GP_API_APP_ID=your_app_id_here
+GP_API_APP_KEY=your_app_key_here
+ENVIRONMENT=TEST  # or PRODUCTION
+MERCHANT_ID=your_merchant_id
+MERCHANT_NAME="Your Merchant Name"
 
-// Capture authorized payment  
-app.post('/capture', ...)
-
-// Process refund
-app.post('/refund', ...)
-
-// Get transaction details
-app.get('/transaction/:id', ...)
+# Google Pay Configuration
+GOOGLE_PAY_MERCHANT_ID=12345678901234567890
+GOOGLE_PAY_COUNTRY_CODE=US
+GOOGLE_PAY_CURRENCY_CODE=USD
+GOOGLE_PAY_BUTTON_COLOR=black
 ```
 
-### Modifying Payment Logic
+### Google Pay Setup
 
-1. Update the `/process-payment` endpoint for your specific flow
-2. Add validation for your required fields
-3. Customize error handling and responses
-4. Add logging and monitoring as needed
+1. Register for a Google Pay merchant account
+2. Configure your merchant settings in the Google Pay console
+3. Add your domain to the allowed origins list
+4. Update the environment variables with your merchant information
 
-### Production Considerations
+### Testing
 
-Enhance the template for production use with:
+- Use Google Pay test cards for development
+- Ensure your development environment uses HTTPS for Google Pay
+- Test with multiple currencies if supporting international payments
+
+## API Endpoints
+
+### GET /config
+Returns Google Pay configuration for client-side initialization:
+
+```json
+{
+  "success": true,
+  "data": {
+    "merchantInfo": {
+      "merchantName": "Your Merchant Name",
+      "merchantId": "your_merchant_id"
+    },
+    "googlePayConfig": {
+      "googleMerchantId": "12345678901234567890",
+      "environment": "TEST",
+      "countryCode": "US",
+      "currencyCode": "USD",
+      "buttonColor": "black"
+    }
+  }
+}
+```
+
+### POST /process-google-pay
+Processes Google Pay payment tokens:
+
+**Request:**
+```json
+{
+  "token": "{google_pay_encrypted_token}",
+  "amount": "10.00",
+  "currency": "USD"
+}
+```
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "message": "Payment successful! Transaction ID: TXN_123456",
+  "data": {
+    "transactionId": "TXN_123456",
+    "amount": "10.00",
+    "currency": "USD",
+    "status": "SUCCESS",
+    "responseCode": "00",
+    "authCode": "AUTH123",
+    "timestamp": "2023-01-01T12:00:00Z"
+  }
+}
+```
+
+## Security Considerations
+
+This implementation includes production-ready security features:
 - Input validation and sanitization
-- Comprehensive error handling and logging
-- Security headers and rate limiting
-- PCI compliance measures
-- Monitoring and alerting
+- Encrypted token processing
+- Comprehensive error handling
+- Transaction verification
+- Secure credential management
+- Rate limiting recommendations
+- HTTPS enforcement for production

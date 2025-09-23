@@ -1,17 +1,19 @@
-# PHP Card Payment Example
+# PHP Google Pay Integration
 
-This example demonstrates card payment processing using PHP and the Global Payments SDK.
+This example demonstrates Google Pay payment processing using PHP and the Global Payments GP-API.
 
 ## Requirements
 
 - PHP 7.4 or later
 - Composer
-- Global Payments account and API credentials
+- Global Payments GP-API account with Google Pay processing enabled
+- Google Pay merchant account
 
 ## Project Structure
 
-- `process-payment.php` - Payment processing script
-- `index.php` - Client-side payment form
+- `process-google-pay.php` - Google Pay payment processing script
+- `config.php` - Configuration endpoint for Google Pay settings
+- `index.html` - Client-side payment form with Google Pay integration
 - `composer.json` - Project dependencies
 - `.env.sample` - Template for environment variables
 - `run.sh` - Convenience script to run the application
@@ -20,10 +22,19 @@ This example demonstrates card payment processing using PHP and the Global Payme
 
 1. Clone this repository
 2. Copy `.env.sample` to `.env`
-3. Update `.env` with your Global Payments credentials:
-   ```
-   PUBLIC_API_KEY=pk_test_xxx
-   SECRET_API_KEY=sk_test_xxx
+3. Update `.env` with your Global Payments GP-API credentials:
+   ```bash
+   GP_API_APP_ID=your_app_id_here
+   GP_API_APP_KEY=your_app_key_here
+   ENVIRONMENT=TEST
+   MERCHANT_ID=your_merchant_id
+   MERCHANT_NAME="Your Merchant Name"
+
+   # Google Pay Configuration
+   GOOGLE_PAY_MERCHANT_ID=12345678901234567890
+   GOOGLE_PAY_COUNTRY_CODE=US
+   GOOGLE_PAY_CURRENCY_CODE=USD
+   GOOGLE_PAY_BUTTON_COLOR=black
    ```
 4. Install dependencies:
    ```bash
@@ -42,47 +53,101 @@ This example demonstrates card payment processing using PHP and the Global Payme
 
 ### Application Structure
 The application uses a simple PHP structure:
-- Static HTML form for payment collection
-- Separate PHP script for payment processing
+- Static HTML form with Google Pay button integration
+- Separate PHP scripts for configuration and payment processing
 - Composer for dependency management
+- Environment-based configuration
 
-### SDK Configuration
-Global Payments SDK configuration using environment variables:
+### GP-API SDK Configuration
+Global Payments GP-API SDK configuration using environment variables:
 - Loads credentials from .env file
-- Sets up service URL for API communication
-- Configures developer identification
+- Sets up GP-API environment (TEST/PRODUCTION)
+- Configures channel for card-not-present transactions
 
-### Payment Processing
-Payment processing flow:
-1. Client submits payment token and billing zip
-2. Server creates CreditCardData with token
-3. Creates Address with postal code
-4. Processes $10 USD charge
-5. Returns success/error response
+### Google Pay Processing
+Google Pay payment processing flow:
+1. Client loads Google Pay configuration from `/config`
+2. User initiates Google Pay and receives encrypted token
+3. Client submits Google Pay token to `/process-google-pay`
+4. Server validates and processes encrypted mobile token
+5. Returns success/error response with transaction details
 
 ### Error Handling
 Implements comprehensive error handling:
-- Catches and processes API exceptions
-- Returns appropriate error messages
+- Validates Google Pay token format
+- Catches and processes GP-API exceptions
+- Returns structured JSON error responses
 - Handles edge cases gracefully
 
 ## API Endpoints
 
-### POST /process-payment.php
-Processes a payment using the provided token and billing information.
+### GET /config
+Returns Google Pay configuration for client-side initialization.
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "merchantInfo": {
+      "merchantName": "Your Merchant Name",
+      "merchantId": "your_merchant_id"
+    },
+    "googlePayConfig": {
+      "googleMerchantId": "12345678901234567890",
+      "environment": "TEST",
+      "countryCode": "US",
+      "currencyCode": "USD",
+      "buttonColor": "black"
+    }
+  }
+}
+```
+
+### POST /process-google-pay
+Processes Google Pay payments using encrypted mobile tokens.
 
 Request Parameters:
-- `payment_token` (string, required) - Token from client-side SDK
-- `billing_zip` (string, required) - Billing postal code
+- `token` (string, required) - Encrypted Google Pay token
+- `amount` (string, required) - Payment amount
+- `currency` (string, optional) - Currency code (USD, EUR, GBP)
+
+Request Example:
+```json
+{
+  "token": "{encrypted_google_pay_token}",
+  "amount": "10.00",
+  "currency": "USD"
+}
+```
 
 Response (Success):
-```
-Payment successful! Transaction ID: xxx
+```json
+{
+  "success": true,
+  "message": "Payment successful! Transaction ID: TXN_123456",
+  "data": {
+    "transactionId": "TXN_123456",
+    "amount": "10.00",
+    "currency": "USD",
+    "status": "SUCCESS",
+    "responseCode": "00",
+    "authCode": "AUTH123",
+    "timestamp": "2023-01-01T12:00:00+00:00"
+  }
+}
 ```
 
 Response (Error):
-```
-Error: [error message]
+```json
+{
+  "success": false,
+  "message": "Payment processing failed",
+  "error": {
+    "code": "API_ERROR",
+    "details": "Detailed error message"
+  }
+}
 ```
 
 ## Security Considerations
