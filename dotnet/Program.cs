@@ -97,25 +97,6 @@ public class Program
     }
 
     /// <summary>
-    /// Sanitizes postal code input by removing invalid characters.
-    /// </summary>
-    /// <param name="postalCode">The postal code to sanitize. Can be null.</param>
-    /// <returns>
-    /// A sanitized postal code containing only alphanumeric characters and hyphens,
-    /// limited to 10 characters. Returns empty string if input is null or empty.
-    /// </returns>
-    private static string SanitizePostalCode(string postalCode)
-    {
-        if (string.IsNullOrEmpty(postalCode)) return string.Empty;
-        
-        // Remove any characters that aren't alphanumeric or hyphen
-        var sanitized = new string(postalCode.Where(c => char.IsLetterOrDigit(c) || c == '-').ToArray());
-        
-        // Limit length to 10 characters
-        return sanitized.Length > 10 ? sanitized[..10] : sanitized;
-    }
-
-    /// <summary>
     /// Configures the Google Pay payment processing endpoint.
     /// </summary>
     /// <param name="app">The web application to configure</param>

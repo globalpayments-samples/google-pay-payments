@@ -105,22 +105,6 @@ public class ProcessPaymentServlet extends HttpServlet {
     }
 
     /**
-     * Sanitizes postal code input by removing invalid characters.
-     * Only allows alphanumeric characters and hyphens, limited to 10 characters.
-     *
-     * @param postalCode The postal code to sanitize, can be null
-     * @return A sanitized postal code containing only alphanumeric characters
-     *         and hyphens, limited to 10 characters. Returns empty string if input is null.
-     */
-    private String sanitizePostalCode(String postalCode) {
-        if (postalCode == null) {
-            return "";
-        }
-        String sanitized = postalCode.replaceAll("[^a-zA-Z0-9-]", "");
-        return sanitized.length() > 10 ? sanitized.substring(0, 10) : sanitized;
-    }
-
-    /**
      * Handles POST requests to /process-google-pay endpoint.
      * Processes Google Pay payments using encrypted mobile tokens.
      *
