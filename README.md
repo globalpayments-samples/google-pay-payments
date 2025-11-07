@@ -4,9 +4,9 @@ This project demonstrates Google Pay payment processing integration with the Glo
 
 ## Available Implementations
 
-- [.NET Core](./dotnet/) - ASP.NET Core web application with Google Pay integration
-- [Java](./java/) - Jakarta EE servlet-based web application with Google Pay support
-- [PHP](./php/) - PHP web application with Google Pay token processing
+- [.NET Core](./dotnet/) - ([Preview](https://githubbox.com/globalpayments-samples/google-pay-payments/tree/main/dotnet)) - ASP.NET Core web application
+- [Java](./java/) - ([Preview](https://githubbox.com/globalpayments-samples/google-pay-payments/tree/main/java)) - Jakarta EE servlet-based web application
+- [PHP](./php/) - ([Preview](https://githubbox.com/globalpayments-samples/google-pay-payments/tree/main/php)) - PHP web application
 
 ## Google Pay Features
 
