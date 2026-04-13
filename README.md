@@ -152,6 +152,15 @@ Processes Google Pay payment tokens:
 }
 ```
 
+## Test Cards
+
+| Brand | Number | CVV | Expiry |
+|-------|--------|-----|--------|
+| Visa | 4263 9826 4026 9299 | 123 | Any future |
+| Mastercard | 5425 2334 2424 1200 | 123 | Any future |
+
+> Google Pay sandbox uses virtual test cards. Refer to the [Google Pay Test Cards](https://developers.google.com/pay/api/web/guides/resources/sample-tokens) docs for token-based testing.
+
 ## Security Considerations
 
 This implementation includes production-ready security features:
@@ -162,3 +171,16 @@ This implementation includes production-ready security features:
 - Secure credential management
 - Rate limiting recommendations
 - HTTPS enforcement for production
+
+## Resources
+
+- [Global Payments Developer Portal](https://developer.globalpayments.com/)
+- [API Reference](https://developer.globalpayments.com/api/references-overview)
+- [Test Cards](https://developer.globalpayments.com/resources/test-cards)
+- [PHP SDK](https://github.com/globalpayments/php-sdk)
+- [Java SDK](https://github.com/globalpayments/java-sdk)
+- [.NET SDK](https://github.com/globalpayments/dotnet-sdk)
+
+## License
+
+MIT
