@@ -89,7 +89,7 @@ These demos have no authentication on either endpoint, ship sandbox `GP_API_APP_
 ## How to Run
 
 ```bash
-cd php && ./run.sh       # PHP — :8000 (php -S 0.0.0.0:8000)
+cd php && ./run.sh       # PHP — :8000 (loopback by default, HOST=0.0.0.0 to expose)
 cd java && ./run.sh      # Java — :8000 (mvn cargo:run, embedded Tomcat 10)
 cd dotnet && ./run.sh    # .NET — :8000 (dotnet run)
 ```
