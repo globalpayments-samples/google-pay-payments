@@ -29,7 +29,7 @@
 ### .NET (ASP.NET Core minimal API + Global Payments SDK)
 - [`dotnet/Program.cs`](dotnet/Program.cs) — `Main()`, `ConfigureGlobalPaymentsSDK()`, `ConfigureEndpoints()` (registers `/config`), `ConfigurePaymentEndpoint()` (registers `/process-google-pay`)
 - [`dotnet/wwwroot/`](dotnet/wwwroot/) — static file root served by `UseDefaultFiles()` / `UseStaticFiles()`
-- [`dotnet/dotnet.csproj`](dotnet/dotnet.csproj) — `GlobalPayments.Api` 9.0.16, `DotEnv.Net` 3.2.1, net9.0
+- [`dotnet/dotnet.csproj`](dotnet/dotnet.csproj) — `GlobalPayments.Api` 9.0.16, `DotEnv.Net` 3.2.1, net10.0
 
 ### Shared / repo root
 - [`index.html`](index.html) — root copy of the payment form (each language also has its own copy; keep them in sync)
