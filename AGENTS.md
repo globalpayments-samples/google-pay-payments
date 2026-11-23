@@ -6,7 +6,7 @@
 
 1. **The encrypted-mobile flow requires two SDK settings together: `mobileType = GOOGLE_PAY` and `TransactionModifier.ENCRYPTED_MOBILE`.** Setting only the modifier (without the mobile type) or only the type (without the modifier) silently sends the token down the wrong code path and the gateway rejects it with a generic decline. PHP sets both in `process-google-pay.php` (`$card->mobileType = EncyptedMobileType::GOOGLE_PAY` plus `->withModifier(TransactionModifier::ENCRYPTED_MOBILE)`); Java uses `MobilePaymentMethodType.GOOGLEPAY` (single word, no underscore) in `ProcessPaymentServlet.doPost()`; .NET uses `EncyptedMobileType.GOOGLE_PAY` in `ConfigurePaymentEndpoint()`. The enum name `EncyptedMobileType` is misspelled in the SDK — do not "fix" it.
 
-2. **PHP exposes endpoints with `.php` extensions; Java and .NET use clean paths.** PHP runs under `php -S` with no router, so the live URLs are `/config.php` and `/process-google-pay.php` (the actual filenames). Java's `@WebServlet(urlPatterns = {"/process-google-pay", "/config"})` and .NET's `app.MapGet("/config", ...)` / `app.MapPost("/process-google-pay", ...)` use the clean form. Any frontend or test harness must branch on language, or PHP needs a rewrite rule added.
+2. **PHP exposes endpoints with `.php` extensions; Java and .NET use clean paths.** PHP runs under `php -S ... router.php`, which only serves the page, its assets and the endpoint scripts, so the live URLs are `/config.php` and `/process-google-pay.php` (the actual filenames). Java's `@WebServlet(urlPatterns = {"/process-google-pay", "/config"})` and .NET's `app.MapGet("/config", ...)` / `app.MapPost("/process-google-pay", ...)` use the clean form. Any frontend or test harness must branch on language, or PHP needs a rewrite rule added.
 
 3. **Google Pay requires a real browser and a Google account to mint a token.** The `/process-google-pay` endpoint cannot be exercised end-to-end with curl alone — the encrypted token is produced client-side by the Google Pay payment sheet, which only renders in a browser with HTTPS (localhost is exempt) and a signed-in Google account. Use the bundled `index.html` to drive a real payment; curl-only testing is limited to `/config` and to malformed-input rejection paths.
 
@@ -29,7 +29,7 @@
 ### .NET (ASP.NET Core minimal API + Global Payments SDK)
 - [`dotnet/Program.cs`](dotnet/Program.cs) — `Main()`, `ConfigureGlobalPaymentsSDK()`, `ConfigureEndpoints()` (registers `/config`), `ConfigurePaymentEndpoint()` (registers `/process-google-pay`)
 - [`dotnet/wwwroot/`](dotnet/wwwroot/) — static file root served by `UseDefaultFiles()` / `UseStaticFiles()`
-- [`dotnet/dotnet.csproj`](dotnet/dotnet.csproj) — `GlobalPayments.Api` 9.0.16, `DotEnv.Net` 3.2.1, net9.0
+- [`dotnet/dotnet.csproj`](dotnet/dotnet.csproj) — `GlobalPayments.Api` 9.0.16, `DotEnv.Net` 3.2.1, net10.0
 
 ### Shared / repo root
 - [`index.html`](index.html) — root copy of the payment form (each language also has its own copy; keep them in sync)
