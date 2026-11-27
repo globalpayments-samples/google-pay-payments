@@ -119,7 +119,7 @@ The happy path on `/process-google-pay` cannot be tested with curl — the reque
 
 ## Making Changes
 
-All three language implementations expose identical behavior (modulo the `.php` URL suffix in PHP). A change to one must be applied to all — each language in a separate commit. Three copies of `index.html` live in this repo (`php/index.html`, `java/src/main/webapp/index.html`, `dotnet/wwwroot/index.html`); keep them in sync. `docker-compose.yml` and the root `package.json` are stale leftovers — do not add new implementations to compose without first cleaning the dead service definitions, and do not assume the root `package.json` is wired to anything.
+All three language implementations expose identical behavior (modulo the `.php` URL suffix in PHP). A change to one must be applied to all, each language in a separate commit. Three copies of `index.html` live in this repo (`php/index.html`, `java/src/main/webapp/index.html`, `dotnet/wwwroot/index.html`); keep them in sync. `docker-compose.yml` and the root `package.json` are stale leftovers, so do not add new implementations to compose without first cleaning the dead service definitions, and do not assume the root `package.json` is wired to anything.
 
 This repo intentionally ships only PHP, Java, and .NET — Node.js, Python, and Go are not present. Do not add a new language implementation without explicit instruction.
 
