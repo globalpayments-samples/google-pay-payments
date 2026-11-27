@@ -4,6 +4,7 @@ using GlobalPayments.Api.Entities.Enums;
 using GlobalPayments.Api.PaymentMethods;
 using GlobalPayments.Api.ServiceConfigs;
 using dotenv.net;
+using System.Globalization;
 using System.Text.Json;
 
 namespace GooglePayPaymentSample;
@@ -97,6 +98,26 @@ public class Program
     }
 
     /// <summary>
+    /// Parses the request body, returning null when it is not a JSON object.
+    /// </summary>
+    private static JsonDocument? ParseJsonObject(string body)
+    {
+        try
+        {
+            var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.ValueKind == JsonValueKind.Object)
+            {
+                return doc;
+            }
+            doc.Dispose();
+        }
+        catch (JsonException)
+        {
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Configures the Google Pay payment processing endpoint.
     /// </summary>
     /// <param name="app">The web application to configure</param>
@@ -110,7 +131,19 @@ public class Program
                 using var reader = new StreamReader(context.Request.Body);
                 var requestBody = await reader.ReadToEndAsync();
 
-                using var jsonDoc = JsonDocument.Parse(requestBody);
+                using var jsonDoc = ParseJsonObject(requestBody);
+                if (jsonDoc == null)
+                {
+                    return Results.BadRequest(new {
+                        success = false,
+                        message = "Invalid request body",
+                        error = new {
+                            code = "INVALID_REQUEST",
+                            details = "Request body must be a JSON object"
+                        }
+                    });
+                }
+
                 var root = jsonDoc.RootElement;
 
                 // Validate required parameters
@@ -139,7 +172,7 @@ public class Program
                 }
 
                 // Extract and validate Google Pay token
-                var googlePayToken = tokenElement.GetString();
+                var googlePayToken = tokenElement.ValueKind == JsonValueKind.String ? tokenElement.GetString() : null;
                 if (string.IsNullOrEmpty(googlePayToken))
                 {
                     return Results.BadRequest(new {
@@ -153,7 +186,9 @@ public class Program
                 }
 
                 // Validate and parse amount
-                if (!decimal.TryParse(amountElement.GetString(), out var amount) || amount <= 0)
+                var amountText = amountElement.ValueKind == JsonValueKind.Number ? amountElement.GetRawText()
+                    : amountElement.ValueKind == JsonValueKind.String ? amountElement.GetString() : null;
+                if (!decimal.TryParse(amountText, NumberStyles.Number, CultureInfo.InvariantCulture, out var amount) || amount <= 0)
                 {
                     return Results.BadRequest(new {
                         success = false,
@@ -181,7 +216,9 @@ public class Program
                 var currency = "USD";
                 if (root.TryGetProperty("currency", out var currencyElement))
                 {
-                    currency = currencyElement.GetString()?.ToUpper() ?? "USD";
+                    currency = currencyElement.ValueKind == JsonValueKind.String
+                        ? currencyElement.GetString()!.ToUpperInvariant()
+                        : "";
                 }
 
                 string[] allowedCurrencies = { "USD", "EUR", "GBP" };
@@ -272,17 +309,14 @@ public class Program
             {
                 // Handle unexpected errors
                 Console.WriteLine($"Google Pay processing error: {ex.Message}");
-                return Results.Problem("An unexpected error occurred"
-                    // new
-                    // {
-                    //     success = false,
-                    //     message = "An unexpected error occurred",
-                    //     error = new {
-                    //         code = "SYSTEM_ERROR",
-                    //         details = "Please try again later"
-                    //     }
-                    // }
-                );
+                return Results.Json(new {
+                    success = false,
+                    message = "An unexpected error occurred",
+                    error = new {
+                        code = "SYSTEM_ERROR",
+                        details = "Please try again later"
+                    }
+                }, statusCode: StatusCodes.Status500InternalServerError);
             }
         });
     }
