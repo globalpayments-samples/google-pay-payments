@@ -4,7 +4,7 @@ This example demonstrates Google Pay payment processing using ASP.NET Core and t
 
 ## Requirements
 
-- .NET 6.0 or later
+- .NET 10 SDK
 - Global Payments GP-API account with Google Pay processing enabled
 - Google Pay merchant account
 
@@ -162,9 +162,9 @@ This example demonstrates basic implementation. For production use, consider:
 
 | Issue | Solution |
 |-------|----------|
-| `dotnet` command not found | Install .NET SDK 6.0+. Run `dotnet --version` to check |
+| `dotnet` command not found | Install the .NET 10 SDK. Run `dotnet --version` to check |
 | Build fails | Run `dotnet restore` before `dotnet run` |
-| Port already in use | Set a different port in `launchSettings.json` or use `--urls` flag |
+| Port already in use | Start with a different port, for example `PORT=8001 ./run.sh` |
 | `.env` not loading | Verify `.env` file exists in the language directory (not project root) |
 
 ---
