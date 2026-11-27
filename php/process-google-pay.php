@@ -65,16 +65,21 @@ function configureSdk(): void
 /**
  * Sanitize and validate currency code
  *
- * @param string|null $currency The currency code to validate
+ * @param mixed $currency The currency code to validate
  *
- * @return string Valid currency code (defaults to GBP)
+ * @return string Valid currency code
+ * @throws ApiException If the currency is not supported
  */
-function sanitizeCurrency(?string $currency): string
+function sanitizeCurrency($currency): string
 {
     $allowedCurrencies = ['USD', 'EUR', 'GBP'];
-    $currency = strtoupper($currency ?? 'GBP');
-    
-    return in_array($currency, $allowedCurrencies, true) ? $currency : 'GBP';
+    $currency = is_string($currency) ? strtoupper($currency) : '';
+
+    if (!in_array($currency, $allowedCurrencies, true)) {
+        throw new ApiException('Currency must be one of: USD, EUR, GBP');
+    }
+
+    return $currency;
 }
 
 /**
@@ -127,7 +132,7 @@ try {
     $requestData = json_decode(file_get_contents('php://input'));
 
     // Validate required POST parameters
-    if (!isset($requestData->token)) {
+    if (!isset($requestData->token) || !is_string($requestData->token)) {
         throw new ApiException('Google Pay token is required');
     }
 
@@ -214,7 +219,7 @@ try {
             'details' => $e->getMessage()
         ]
     ]);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     // Handle unexpected errors
     error_log('Google Pay processing error: ' . $e->getMessage());
     http_response_code(500);
